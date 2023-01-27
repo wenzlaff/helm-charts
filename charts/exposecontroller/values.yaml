@@ -4,7 +4,7 @@
 
 image:
   repository: wenzlaff/exposecontroller
-  tag:
+  tag: 1.1.0
   pullPolicy: IfNotPresent
 
 nameOverride: ""
