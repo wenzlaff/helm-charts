@@ -1,0 +1,74 @@
+{{- $cluster := not (or .Values.watchCurrentNamespace (kindIs "invalid" .Values.watchCurrentNamespace)) -}}
+{{- if not (kindIs "invalid" .Values.watchNamespaces) -}}
+  {{- $cluster = true -}}
+  {{- if not .Values.watchNamespaces -}}
+    {{- fail "watchNamespaces must be either nil or not empty" -}}
+  {{- else if .Values.watchCurrentNamespace -}}
+    {{- fail "cannot use both watchNamespaces and watchCurrentNamespace" -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if $cluster -}}
+kind: ClusterRole
+{{- else -}}
+kind: Role
+{{- end }}
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "exposecontroller.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "exposecontroller.name" . }}
+    helm.sh/chart: {{ include "exposecontroller.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+rules:
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "watch", "list", "patch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "update"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "create", "update", "delete"]
+- apiGroups: [""]
+  resources: ["nodes", "namespaces"]
+  verbs: ["get", "list"]
+---
+{{- if $cluster }}
+kind: ClusterRoleBinding
+{{- else }}
+kind: RoleBinding
+{{- end }}
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "exposecontroller.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "exposecontroller.name" . }}
+    helm.sh/chart: {{ include "exposecontroller.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+roleRef:
+  {{- if $cluster }}
+  kind: ClusterRole
+  {{- else }}
+  kind: Role
+  {{- end }}
+  name: {{ include "exposecontroller.fullname" . }}
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "exposecontroller.fullname" . }}
+{{- if $cluster }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: {{ include "exposecontroller.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "exposecontroller.name" . }}
+    helm.sh/chart: {{ include "exposecontroller.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}

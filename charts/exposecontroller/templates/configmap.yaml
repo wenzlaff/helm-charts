@@ -1,0 +1,50 @@
+{{- if .Values.config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  # name: {{ include "exposecontroller.fullname" . }}
+  name: exposecontroller
+  labels:
+    app.kubernetes.io/name: {{ include "exposecontroller.name" . }}
+    helm.sh/chart: {{ include "exposecontroller.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  config.yml: |-
+  {{- if .Values.config.exposer }}
+    exposer: {{ .Values.config.exposer  }}
+  {{- end }}
+  {{- if .Values.config.domain }}
+    domain: {{ .Values.config.domain }}
+  {{- end }}
+  {{- if .Values.config.internalDomain }}
+    internal-domain: {{ .Values.config.internalDomain }}
+  {{- end }}
+  {{- if .Values.config.pathMode }}
+    path-mode: {{ .Values.config.pathMode }}
+  {{- end }}
+  {{- if .Values.config.ingressClass }}
+    ingress-class: {{ .Values.config.ingressClass }}
+  {{- end }}
+  {{- if .Values.config.urltemplate }}
+    urltemplate: {{ .Values.config.urltemplate | quote }}
+  {{- end }}
+  {{- if .Values.config.http }}
+    http: true
+  {{- end }}
+  {{- if .Values.config.tlsacme }}
+    tls-acme: true
+  {{- end }}
+  {{- if .Values.config.tlsSecretName }}
+    tls-secret-name: {{ .Values.config.tlsSecretName }}
+  {{- end }}
+  {{- if .Values.config.tlsUseWildcard }}
+    tls-use-wildcard: {{ .Values.config.tlsUseWildcard }}
+  {{- end }}
+  {{- if .Values.config.namePrefix }}
+    name-prefix: {{ .Values.config.namePrefix }}
+  {{- end }}
+  {{- if .Values.config.extravalues }}
+    {{- toYaml .Values.config.extravalues | nindent 4 }}
+  {{- end }}
+{{- end }}

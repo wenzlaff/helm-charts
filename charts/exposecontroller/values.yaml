@@ -1,0 +1,35 @@
+# Default values for exposecontroller.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: wenzlaff/exposecontroller
+  tag:
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+timeout: null
+resyncPeriod: null
+daemon: false
+clean: false
+watchNamespaces: null
+watchCurrentNamespace: true
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+annotations: {}
+args: []
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# old format, with uppercase for some reason
+Args: []
+Annotations: {}
